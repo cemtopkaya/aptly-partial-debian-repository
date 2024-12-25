@@ -1,0 +1,38 @@
+services:
+  client:
+    image: ubuntu:jammy
+    container_name: client
+    command: tail -f /dev/null
+    tty: true
+    stdin_open: true
+    volumes:
+      # - ./repo.list:/etc/apt/sources.list.d/repo.list
+      - ./repo.list:/etc/apt/sources.list
+
+  aptly:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: registry.ulakhaberlesme.com.tr/debrepo/aptly
+#    command: tail -f /dev/null
+    working_dir: /root/
+    command: /root/create-repo.sh
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      APTLY_CONFIG_PATH: "/root/.aptly.conf"
+      # APTLY_ROOT: "/root/.aptly"
+      APTLY_ROOT: "/opt/aptly"
+    volumes:
+#      - ./aptly.conf:/opt/config/aptly.conf
+      # - ./aptly.conf:/root/.aptly.conf
+      - ./create-repo.sh:/root/create-repo.sh
+      # - ./nginx.conf:/etc/nginx/nginx.conf
+      # - ./nginx.conf:/etc/nginx/sites-available/default
+      # - aptly-data:/root/.aptly
+#      - aptly-data:/opt/repo
+
+volumes:
+  aptly-data:
+
