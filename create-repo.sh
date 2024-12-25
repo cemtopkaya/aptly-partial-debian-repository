@@ -46,7 +46,7 @@ EOF
 
 clean_old_repo() {
     echo "[INFO] Cleaning old repository..."
-    aptly repo drop iproute2-repo || true
+    aptly repo drop repo || true
 }
 
 # Create new repository
@@ -56,11 +56,11 @@ create_new_repo() {
         repo create \
         -distribution=stable \
         -component=main \
-        iproute2-repo
+        repo
 }
 
-# Download and add iproute2 package
-download_and_add_iproute2() {
+# Download and add debian package and its dependencies
+download_and_add_package() {
     local download_dir="/tmp/download"
     
     echo "[INFO] Creating download directory..."
@@ -69,14 +69,14 @@ download_and_add_iproute2() {
     echo "[INFO] Setting directory permissions..."
     chown -R _apt:root "$download_dir"
     
-    echo "[INFO] Downloading iproute2 package and dependencies..."
-    cd "$download_dir"
     PACKAGE_NAME="net-tools"
+    echo "[INFO] Downloading $PACKAGE_NAME package and dependencies..."
+    cd "$download_dir"
     apt-get download $PACKAGE_NAME
     apt-get download $(apt-cache depends $PACKAGE_NAME | grep Depends | cut -d: -f2 | tr -d '<>' | tr -d ' ')
     
     echo "[INFO] Adding package to repository..."
-    aptly repo add iproute2-repo iproute2_*.deb || true
+    aptly repo add repo *.deb || true
 }
 
 # Publish repository
@@ -86,7 +86,7 @@ publish_repo() {
         publish repo \
         -architectures=amd64 \
         -skip-signing \
-        iproute2-repo
+        repo
 }
 
 # Setup and start nginx
@@ -132,7 +132,7 @@ main() {
     create_aptly_conf
     clean_old_repo
     create_new_repo
-    download_and_add_iproute2
+    download_and_add_package
     publish_repo
     setup_nginx
 }

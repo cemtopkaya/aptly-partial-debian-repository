@@ -22,16 +22,10 @@ services:
       - "8081:80"
     environment:
       APTLY_CONFIG_PATH: "/root/.aptly.conf"
-      # APTLY_ROOT: "/root/.aptly"
       APTLY_ROOT: "/opt/aptly"
     volumes:
-#      - ./aptly.conf:/opt/config/aptly.conf
-      # - ./aptly.conf:/root/.aptly.conf
       - ./create-repo.sh:/root/create-repo.sh
-      # - ./nginx.conf:/etc/nginx/nginx.conf
-      # - ./nginx.conf:/etc/nginx/sites-available/default
-      # - aptly-data:/root/.aptly
-#      - aptly-data:/opt/repo
+      - aptly-data:$APTLY_ROOT
 
 volumes:
   aptly-data:
